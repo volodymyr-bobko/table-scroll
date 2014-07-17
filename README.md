@@ -1,5 +1,7 @@
 Table Scroll
 
+Try it here - http://table-scroll.site90.com
+
 jQuery.table_scroll plugin adds scrolling to HTML table element.
 
 Features
