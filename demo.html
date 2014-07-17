@@ -1,0 +1,356 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Table Scroll jQuery plugin</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css" />
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+    <script src="table-scroll.js"></script>
+    <script src="demo.js"></script>
+    <link rel="stylesheet" href="demo.css" />
+</head>
+<body>
+    
+    <div class="section">
+        <h1>Table Scroll</h1>
+        <code>jQuery.table_scroll</code> plugin adds scrolling to HTML <code>table</code> element.
+    </div>
+    
+    <div class="section">
+        <h1>Features</h1>
+        <ul>
+            <li>Supports table header and footer.</li>
+            <li>Doesn't clone table elements - so your events stay bound.</li>
+            <li>Doesn't divide your table into separate parts for scrolling, it means that width of column header is always in sync width cells width.</li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h1>API</h1>
+        
+        <h2>Options:</h2>
+        <ul>
+            <li><b>rowsInHeader</b> - Default: 1. Number of rows in table header. If table has <code>thead</code> element defined, this option should not be specified.</li>
+            <li><b>rowsInFooter</b> - Default: 0. Number of rows in table footer. If table has <code>tfoot</code> element defined, this option should not be specified.</li>
+            <li><b>rowsInScrollableArea</b> - Default: 10. Number of rows that remains visible in scrollable area.</li>
+            <li><b>overflowY</b> - Default: 'auto'. Possible values 'scroll', 'auto'.
+                <ul>'auto' - Scroll appears only if overflowing rows exists.</ul>
+                <ul>'scroll' - Scroll is always visible, and will be disabled if there are no overflowing rows.</ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="section semple-section">
+        <h2>Example 1 - floating <code>thead</code> and <code>tfoot</code>.</h2>
+        <hr/>
+        <table width="100%" class="semple">
+            <thead>
+                <tr>
+                    <td>
+                        Demo
+                    </td>
+                    <td>
+                        JabvaScript
+                    </td>
+                    <td>
+                        HTML
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="holder-semple-1">
+                        <script id="tamplate-semple-1" type="text/mustache">
+                            <table width="100%" class="inner-table" border="1">
+                                <thead>
+                                    <tr>
+                                        <td>Column 1</td>
+                                        <td>Column 2</td>
+                                        <td>Column 3</td>
+                                        <td>Column 4</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#rows}}
+                                    <tr>
+                                        <td>Cell {{number}} 1</td>
+                                        <td>Cell {{number}} 2</td>
+                                        <td>Cell {{number}} 3</td>
+                                        <td>Cell {{number}} 4</td>
+                                    </tr>
+                                    {{/rows}}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>Footer 1</td>
+                                        <td>Footer 2</td>
+                                        <td>Footer 3</td>
+                                        <td>Footer 4</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </script>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-js">
+$('table').table_scroll();
+</pre>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-html" style="overflow-x:auto;height: 320px">
+&lt;table border=&quot;1&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Column 1&lt;/td&gt;
+            &lt;td&gt;Column 2&lt;/td&gt;
+            &lt;td&gt;Column 3&lt;/td&gt;
+            &lt;td&gt;Column 4&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1 1&lt;/td&gt;
+            &lt;td&gt;Cell 1 2&lt;/td&gt;
+            &lt;td&gt;Cell 1 3&lt;/td&gt;
+            &lt;td&gt;Cell 1 4&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 2 1&lt;/td&gt;
+            &lt;td&gt;Cell 2 2&lt;/td&gt;
+            &lt;td&gt;Cell 2 3&lt;/td&gt;
+            &lt;td&gt;Cell 2 4&lt;/td&gt;
+        &lt;/tr&gt;
+        ...    
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Footer 1&lt;/td&gt;
+            &lt;td&gt;Footer 2&lt;/td&gt;
+            &lt;td&gt;Footer 3&lt;/td&gt;
+            &lt;td&gt;Footer 4&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section semple-section">
+        <h2>Example 2 - floating header and footer for table that has <code>tbody</code> only.</h2>
+        <hr />
+        <table width="100%" class="semple">
+            <thead>
+                <tr>
+                    <td>
+                        Demo
+                    </td>
+                    <td>
+                        JabvaScript
+                    </td>
+                    <td>
+                        HTML
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="holder-semple-2">
+                        <script id="tamplate-semple-2" type="text/mustache">
+                            <table width="100%" class="inner-table" border="1">
+                                <tr>
+                                    <td>Column 1</td>
+                                    <td>Column 2</td>
+                                    <td>Column 3</td>
+                                    <td>Column 4</td>
+                                </tr>
+                                {{#rows}}
+                                <tr>
+                                    <td>Cell {{number}} 1</td>
+                                    <td>Cell {{number}} 2</td>
+                                    <td>Cell {{number}} 3</td>
+                                    <td>Cell {{number}} 4</td>
+                                </tr>
+                                {{/rows}}
+                                <tr>
+                                    <td>Footer 1</td>
+                                    <td>Footer 2</td>
+                                    <td>Footer 3</td>
+                                    <td>Footer 4</td>
+                                </tr>                                
+                            </table>
+                        </script>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-js">$('table').table_scroll({
+    rowsInFooter: 1
+});
+</pre>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-html" style="overflow-x:auto;height: 320px">
+&lt;table border=&quot;1&quot;&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Column 1&lt;/td&gt;
+        &lt;td&gt;Column 2&lt;/td&gt;
+        &lt;td&gt;Column 3&lt;/td&gt;
+        &lt;td&gt;Column 4&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Cell 1 1&lt;/td&gt;
+        &lt;td&gt;Cell 1 2&lt;/td&gt;
+        &lt;td&gt;Cell 1 3&lt;/td&gt;
+        &lt;td&gt;Cell 1 4&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Cell 2 1&lt;/td&gt;
+        &lt;td&gt;Cell 2 2&lt;/td&gt;
+        &lt;td&gt;Cell 2 3&lt;/td&gt;
+        &lt;td&gt;Cell 2 4&lt;/td&gt;
+    &lt;/tr&gt;
+    ...
+    &lt;tr&gt;
+        &lt;td&gt;Footer 1&lt;/td&gt;
+        &lt;td&gt;Footer 2&lt;/td&gt;
+        &lt;td&gt;Footer 3&lt;/td&gt;
+        &lt;td&gt;Footer 4&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section semple-section">
+        <h2>Example 3 - multi row <code>thead</code> and <code>tfoot</code>.</h2>
+        <hr />
+        <table width="100%" class="semple">
+            <thead>
+                <tr>
+                    <td>
+                        Demo
+                    </td>
+                    <td>
+                        JabvaScript
+                    </td>
+                    <td>
+                        HTML
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="holder-semple-3">
+                        <script id="tamplate-semple-3" type="text/mustache">
+                            <table width="100%" class="inner-table" border="1">
+                                <thead>
+                                    <tr>
+                                        <td colspan="2">Column 1 - 2</td>
+                                        <td>Column 3</td>
+                                        <td rowspan="3">Column 4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Column 1</td>
+                                        <td colspan="2">Column 2 - 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" >Column 1 - 2</td>
+                                        <td>Column 3</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#rows}}
+                                    <tr>
+                                        <td>Cell {{number}} 1</td>
+                                        <td>Cell {{number}} 2</td>
+                                        <td>Cell {{number}} 3</td>
+                                        <td>Cell {{number}} 4</td>
+                                    </tr>
+                                    {{/rows}}
+                                </tbody>
+<tfoot>
+    <tr>
+        <td rowspan="3">Footer 1</td>
+        <td colspan="2">Footer 2 - 3</td>
+        <td rowspan="2">Footer 4</td>
+    </tr>
+    <tr>
+        <td>Footer 2</td>
+        <td>Footer 3</td>
+    </tr>
+    <tr>
+        <td>Footer 2</td>
+        <td colspan="2">Footer 3 - 4</td>
+    </tr>
+</tfoot>
+                            </table>
+                        </script>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-js">
+$('table').table_scroll();
+</pre>
+                    </td>
+                    <td>
+                        <pre class="prettyprint lang-html" style="overflow-x:auto;height: 445px">
+&lt;table border=&quot;1&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Column 1 - 2&lt;/td&gt;
+            &lt;td&gt;Column 3&lt;/td&gt;
+            &lt;td rowspan=&quot;3&quot;&gt;Column 4&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Column 1&lt;/td&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Column 2 - 3&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td colspan=&quot;2&quot; &gt;Column 1 - 2&lt;/td&gt;
+            &lt;td&gt;Column 3&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1 1&lt;/td&gt;
+            &lt;td&gt;Cell 1 2&lt;/td&gt;
+            &lt;td&gt;Cell 1 3&lt;/td&gt;
+            &lt;td&gt;Cell 1 4&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 2 1&lt;/td&gt;
+            &lt;td&gt;Cell 2 2&lt;/td&gt;
+            &lt;td&gt;Cell 2 3&lt;/td&gt;
+            &lt;td&gt;Cell 2 4&lt;/td&gt;
+        &lt;/tr&gt;
+        ...    
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;
+            &lt;td rowspan=&quot;3&quot;&gt;Footer 1&lt;/td&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Footer 2 - 3&lt;/td&gt;
+            &lt;td rowspan=&quot;2&quot;&gt;Footer 4&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Footer 2&lt;/td&gt;
+            &lt;td&gt;Footer 3&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Footer 2&lt;/td&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Footer 3 - 4&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
