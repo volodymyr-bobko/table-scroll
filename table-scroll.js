@@ -1,22 +1,42 @@
 ﻿(function ($, undefined) {
 
+    var CELL_INDEX_DATA = '_sg_index_';
+    var CELL_SPAN_ADJUSTMENTS = '_sg_adj_';
+
     $.widget("ui.table_scroll", {
         version: "1.0.0",
         options:
         {
             rowsInHeader: null,
             rowsInFooter: null,
+
+            fixedColumnsLeft: 0,
+            fixedColumnsRight: 0,
+
             rowsInScrollableArea: 10,
+            columnsInScrollableArea: 5,
+
             overflowY: 'auto', /*scroll, auto*/
+            overflowX: 'auto', /*scroll, auto*/
         },
 
         _create: function () {
+            this._columnsCount = -1;
 
             this._ensureSettings();
 
             this.startFrom = 0;
+
+            this._setActualCellIndexes();
+
             this._yInitScroll();
             this._yUpdateRowsVisibility();
+
+            this._xInitScroll();
+            this._xUpdateColumnsVisibility();
+
+            this._yUpdateScrollHeights();
+        
             this.widget().on("mousewheel", $.proxy(this._tableMouseWheel, this));
             this.widget().on("DOMMouseScroll", $.proxy(this._tableMouseWheel, this)); // Firefox
         },
@@ -38,8 +58,158 @@
             }
         },
 
+        // horisontal scrolling methods
+        _xGetNumberOfColumns: function () {
+            if (this._columnsCount != -1)
+                return this._columnsCount;
+
+            this._columnsCount = Math.max.apply(null, $(this._table().rows).map(function () { return this.cells.length; }).get());
+
+            if ($('.sg-v-scroll-cell', this.widget()).length > 0)
+                this._columnsCount -= 1;
+
+            return this._columnsCount;
+        },
+
+        _xNumberOfScrollableColumns: function() {
+            var width = this._xGetNumberOfColumns() - this.options.fixedColumnsLeft - this.options.fixedColumnsRight;
+            if(width < 1)
+                return 1;
+            return width;
+        },
+
+        _xScrollWidth: function() {
+            var width = this._xGetNumberOfColumns() - this.options.fixedColumnsLeft - this.options.fixedColumnsRight;
+            if (width > this.options.columnsInScrollableArea)
+                return this.options.columnsInScrollableArea;
+            if (width < 1)
+                return 1;
+            return width;
+        },
+
+        _xScrollNeeded : function() {
+            var width = this._xGetNumberOfColumns() - this.options.fixedColumnsLeft - this.options.fixedColumnsRight;
+            return width > this.options.columnsInScrollableArea;
+        },
+
+        _xInitScroll: function() {
+            if (this._xGetNumberOfColumns() < (this.options.fixedColumnsLeft + this.options.fixedColumnsRight))
+                return;
+
+            if (this._xScrollNeeded() || this.options.overflowX == 'scroll') {
+
+                var row = this._table().insertRow(this._table().rows.length);
+
+                if (this.options.fixedColumnsLeft > 0) {
+                    var $cell = $(row.insertCell(0));
+                    $cell.attr('colspan', this.options.fixedColumnsLeft);
+                }
+
+                var $container = $(row.insertCell(1));
+                $container.attr('colspan', this._xScrollWidth());
+                $container.addClass('sg-x-scroll-cell');
+
+                var $widthDivContainer = $('<div class="sg-h-scroll-container"></div>');
+                $widthDivContainer.css('overflow-x', 'scroll');
+                $widthDivContainer.css('margin-right', '-20000px');
+                $widthDivContainer.width($container.width());
+
+                var $widthDiv = $('<div style="height: 1px;"></div>');
+                $widthDiv.width((this._xNumberOfScrollableColumns() / this._xScrollWidth()) * $container.width());
+                $widthDiv.appendTo($widthDivContainer);
+
+                $widthDivContainer.appendTo($container);
+                $widthDivContainer.scroll($.proxy(this._xUpdateColumnsVisibility, this));
+
+                if (this.options.fixedColumnsRight > 0) {
+                    var $cell = $(row.insertCell(2));
+                    $cell.attr('colspan', this.options.fixedColumnsRight + 
+                        ($('.sg-v-scroll-cell', this.widget()).length > 0 ? 1 : 0));
+                }
+            }
+        },
+
+        _xCurrentRelativeScrollLeft: function () {
+            var $widthDivContainer = $('.sg-h-scroll-container', this.widget());
+            return $widthDivContainer.scrollLeft() / $widthDivContainer.width();
+        },
+
+        _xScrollDelta: function () {
+            var widthContainer = $('.sg-h-scroll-container', this.widget());
+            return $('div', widthContainer).width() - widthContainer.width();
+        },
+
+        _xScrollableColumnsCount: function () {
+            return this._xNumberOfScrollableColumns() - this._xScrollWidth();
+        },
+
+        _xColumnScrollStep: function () {
+            if (this._xScrollableColumnsCount() == 0)
+                return 0;
+            return this._xScrollDelta() / this._xScrollableColumnsCount();
+        },
+
+        _setColumnVisibility: function(index, visible, start, end) {
+            var rows = this._table().rows;
+
+            for (var rowIndex = start; rowIndex < end; rowIndex++) {
+                var row = rows[rowIndex];
+
+                for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex++) {
+
+                    var $cell = $(row.cells[cellIndex]);
+                    if ($cell.data(CELL_INDEX_DATA) == index) {
+
+                        if (!$cell.attr('colspan') || $cell.attr('colspan') < 1) // apply visibility only for cells with colspan = 1
+                        {
+                            if (visible)
+                                $cell.show();
+                            else
+                                $cell.hide();
+                        }
+                    }
+                }
+            }
+        },
+
+        _xUpdateColumnsVisibility: function() {
+            if (!this._xScrollNeeded())
+                return;
+
+            var leftContainer = $('.sg-h-scroll-container', this.widget());
+
+            var startFromX = Math.floor(leftContainer.scrollLeft() / this._xColumnScrollStep());
+            var relativeLeft = this._xCurrentRelativeScrollLeft();
+            for (var i = this.options.fixedColumnsLeft; i < this._xGetNumberOfColumns() - this.options.fixedColumnsRight; i++) {
+                var visible = false;
+
+                if (i >= this.options.fixedColumnsLeft + startFromX
+                        &&
+                        i < this.options.fixedColumnsLeft + startFromX + this.options.columnsInScrollableArea
+                ) {
+                    visible = true;
+                }
+
+                this._setColumnVisibility(i, visible, 0, this._table().rows.length - 1 /* ignore scrolling row */);
+            }
+            this._xUpdateScrollWidths();
+        },
+
+        _xUpdateScrollWidths: function () {
+            
+            var leftContainer = $('.sg-h-scroll-container', this.widget());
+            var $container = leftContainer.closest('td');
+            leftContainer.width($container.width());
+            var $widthDiv = $('div', leftContainer);
+            $widthDiv.width((this._xNumberOfScrollableColumns() / this._xScrollWidth()) * $container.width());
+        },
+
+        // vertical scrolling methods
         _yScrollHeight:function() {
             var height = this._table().rows.length - this.options.rowsInHeader - this.options.rowsInFooter;
+            if ($('.sg-h-scroll-container', this.widget()).length > 0)
+                height--;
+
             if (height > this.options.rowsInScrollableArea)
                 return this.options.rowsInScrollableArea;
             if (height < 1)
@@ -49,6 +219,9 @@
         
         _yNumberOfScrollableRows: function () {
             var height = this._table().rows.length - this.options.rowsInHeader - this.options.rowsInFooter;
+            if ($('.sg-h-scroll-container', this.widget()).length > 0)
+                height--;
+
             if (height < 1)
                 return 1;
             return height;
@@ -56,6 +229,8 @@
 
         _yScrollNeeded: function() {
             var height = this._table().rows.length - this.options.rowsInHeader - this.options.rowsInFooter;
+            if ($('.sg-h-scroll-container', this.widget()).length > 0)
+                height--;
             return height > this.options.rowsInScrollableArea;
         },
 
@@ -89,7 +264,7 @@
                     var $bottomCell = $(firstBotomRow.insertCell(firstBotomRow.cells.length));
                     $bottomCell.attr('rowspan', this.options.rowsInFooter);
                 }
-            }  
+            }
         },
 
         _yCurrentRelativeScrollTop: function() {
@@ -138,6 +313,17 @@
             return this._yScrollDelta() / this._yScrollableRowsCount();
         },
 
+        _yUpdateScrollHeights: function () {
+
+            var topContainer = $('.sg-v-scroll-container', this.widget());
+            var $container = topContainer.closest('td');
+            topContainer.hide();
+            topContainer.height($container.height());
+            var $heightDiv = $('div', topContainer);
+            $heightDiv.height((this._yNumberOfScrollableRows() / this._yScrollHeight()) * $container.height());
+            topContainer.show();
+        },
+
         _yUpdateRowsVisibility: function () {
 
             if (!this._yScrollNeeded())
@@ -147,7 +333,8 @@
 
             var startFrom = Math.floor(topContainer.scrollTop() / this._yRowScrollStep());
             var relativeTop = this._yCurrentRelativeScrollTop();
-            for (var i = this.options.rowsInHeader; i < this._table().rows.length - this.options.rowsInFooter; i++) {
+
+            for (var i = this.options.rowsInHeader; i < this._table().rows.length - this.options.rowsInFooter - $('.sg-h-scroll-container', this.widget()).length; i++) {
                 var visible = false;
 
                 if (i >= this.options.rowsInHeader + startFrom
@@ -221,6 +408,61 @@
         
         _table: function() {
             return this.widget().get(0);
+        },
+
+        _setActualCellIndexes: function() {
+            var rows = this._table().rows;
+
+            for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                var row = rows[rowIndex];
+                var indAdjustments = $(row).data(CELL_SPAN_ADJUSTMENTS);
+                if (!indAdjustments)
+                    indAdjustments = [];
+
+                for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex++) {
+
+                    var prevCellEndsAt = cellIndex - 1;
+
+                    if (cellIndex > 0) {
+                        var $prevCell = $(row.cells[cellIndex - 1]);
+                        prevCellEndsAt = $prevCell.data(CELL_INDEX_DATA);
+                        if ($prevCell.attr('colspan')) {
+                            prevCellEndsAt += this._getColSpan($prevCell) - 1;
+                        }
+                    }
+
+                    var $cell = $(row.cells[cellIndex]);
+                    var indexToSet = prevCellEndsAt + 1;
+
+                    for (var i = 0; i < indAdjustments.length; i++) {
+                        if (indAdjustments[i].index <= indexToSet) {
+                            indexToSet += indAdjustments[i].adjustment;
+                            indAdjustments[i].adjustment = 0;
+                        }
+                    }
+                    
+                    $cell.data(CELL_INDEX_DATA, indexToSet);
+
+                    if ($cell.attr('rowspan') > 1 ) {
+                        var span = $cell.attr('rowspan');
+
+                        for (var rowShift = rowIndex + 1; rowShift < rowIndex + span && rowShift < rows.length; rowShift++) {
+                            var $shiftedRow = $(rows[rowShift]);
+                            var adjustments = $shiftedRow.data(CELL_SPAN_ADJUSTMENTS);
+                            if (!adjustments)
+                                adjustments = [];
+                            adjustments.push({ index: indexToSet, adjustment: this._getColSpan($cell) });
+                            $shiftedRow.data(CELL_SPAN_ADJUSTMENTS, adjustments);
+                        }
+                    }
+                }
+            }
+        },
+
+        _getColSpan: function($cell) {
+            if ($cell.data('scroll-span'))
+                return $cell.data('scroll-span');
+            return $cell.attr('colspan') | 1;
         }
     });
 

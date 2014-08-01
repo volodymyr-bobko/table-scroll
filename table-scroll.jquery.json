@@ -1,13 +1,14 @@
 {
     "name": "table-scroll",
     "title": "jQuery Table Scroll",
-    "description": "jQuery plugin that adds scrolling to HTML table element.",
+    "description": "jQuery.table_scroll plugin adds vertical and horizontal scrollbars to HTML table element.",
     "keywords": [
         "scrolling",
-		"scroll",
+        "fixed columns",
+        "scroll",
         "table"
     ],
-    "version": "1.0.0",
+    "version": "2.0.0",
     "author": {
         "name": "Volodymyr Bobko",
         "url": "http://icocentre.com"
@@ -20,11 +21,11 @@
     ],
     "bugs": "https://github.com/vol-bob/table-scroll/issues",
     "homepage": "https://github.com/vol-bob/table-scroll",
-	"demo" : "http://table-scroll.site90.com/",
+    "demo" : "http://table-scroll.site90.com/",
     "docs": "https://github.com/vol-bob/table-scroll/wiki",
     "download": "https://codeload.github.com/vol-bob/table-scroll/zip/master",
     "dependencies": {
         "jquery": ">=2.0",
-		"jquery-ui": ">=1.10"
+        "jquery-ui": ">=1.10"
     }
 }

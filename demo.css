@@ -70,3 +70,40 @@ ul>li {
 .semple-section pre {
     border: none;
 }
+
+.inner-table {
+    border-collapse:collapse;
+}
+
+.inner-table>thead>tr>td {
+    border: 1px solid black;
+    padding:5px;
+    vertical-align: middle;
+    font-weight:bold;
+}
+
+.inner-table>thead>tr>td[colspan] {
+    text-align:center;
+}
+
+.inner-table>tbody>tr>td {
+    color: #777;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+}
+
+.inner-table>tbody>tr:hover>td {
+    color: #1a727c;
+}
+
+.inner-table>tfoot>tr>td {
+    border: 1px solid black;
+    padding:5px;
+    vertical-align: middle;
+    font-weight:bold;
+}
+
+.inner-table>tbody>tr {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+}
