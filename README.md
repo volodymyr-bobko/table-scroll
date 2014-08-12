@@ -7,6 +7,7 @@ jQuery.table_scroll plugin adds vertical and horizontal scrollbars to HTML table
 Features
   Vertical scrolling.
   Horizontal scrolling with possibility to specify left and right fixed columns.
+  Touch screen support.
   Auto detect vertical scrollable area and excluds thead and tfoot.
   Doesn't clone table elements - so your events stay bound.
   Doesn't divide your table into separate parts for scrolling, it means that width of column header is always in sync with cells width.
