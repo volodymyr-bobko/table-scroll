@@ -22,7 +22,8 @@
 
         _create: function () {
             this._columnsCount = -1;
-
+            this._currentTouch = null;
+            
             this._ensureSettings();
 
             this.startFrom = 0;
@@ -39,6 +40,10 @@
         
             this.widget().on("mousewheel", $.proxy(this._tableMouseWheel, this));
             this.widget().on("DOMMouseScroll", $.proxy(this._tableMouseWheel, this)); // Firefox
+            this.widget().on('touchstart', $.proxy(this._touchStart, this));
+            this.widget().on('touchmove', $.proxy(this._touchMove, this));
+            this.widget().on('touchend', $.proxy(this._touchEnd, this));
+            
         },
 
         _ensureSettings: function() {
@@ -156,20 +161,48 @@
                 var row = rows[rowIndex];
 
                 for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex++) {
+                    
+                    //in this cycle body we can't use jQuery because this code is critical for performance
 
-                    var $cell = $(row.cells[cellIndex]);
-                    if ($cell.data(CELL_INDEX_DATA) == index) {
+                    var cell = row.cells[cellIndex];
+                    var cIndex = cell[CELL_INDEX_DATA];
+                    if (cIndex == index) {
 
-                        if (!$cell.attr('colspan') || $cell.attr('colspan') < 1) // apply visibility only for cells with colspan = 1
+                        if (!cell.colSpan || cell.colSpan == 1) // apply visibility only for cells with colspan = 1
                         {
-                            if (visible)
-                                $cell.show();
-                            else
-                                $cell.hide();
+                            if (visible && cell.style.display == 'none')
+                                cell.style.display = '';
+                            
+                            if (!visible && cell.style.display != 'none')
+                                cell.style.display = 'none';
                         }
                     }
                 }
             }
+        },
+
+        _xFirstVisibleColumnWidth: function () {
+            for (var i = this.options.rowsInHeader; i < this._table().rows.length - this.options.rowsInFooter - $('.sg-h-scroll-container', this.widget()).length; i++) {
+                if ($(this._table().rows[i]).css('display') != 'none') {
+                    for (var j = this.options.fixedColumnsLeft; j < this._xGetNumberOfColumns() - this.options.fixedColumnsRight; j++) {
+                        if ($(this._table().rows[i].cells[j]).css('display') != 'none')
+                            return $(this._table().rows[i].cells[j]).width();
+                    }
+                }
+            }
+            return 0;
+        },
+
+        _xLastVisibleColumnWidth: function () {
+            for (var i = this.options.rowsInHeader; i < this._table().rows.length - this.options.rowsInFooter - $('.sg-h-scroll-container', this.widget()).length; i++) {
+                if ($(this._table().rows[i]).css('display') != 'none') {
+                    for (var j = this._xGetNumberOfColumns() - this.options.fixedColumnsRight - 1; j >= this.options.fixedColumnsLeft ; j--) {
+                        if ($(this._table().rows[i].cells[j]).css('display') != 'none')
+                            return $(this._table().rows[i].cells[j]).width();
+                    }
+                }
+            }
+            return 0;
         },
 
         _xUpdateColumnsVisibility: function() {
@@ -324,6 +357,24 @@
             topContainer.show();
         },
 
+        _yFirstVisibleRowHeight: function(){
+            for (var i = this.options.rowsInHeader; i < this._table().rows.length - this.options.rowsInFooter - $('.sg-h-scroll-container', this.widget()).length; i++) {
+                if ($(this._table().rows[i]).css('display') != 'none') {
+                    return $(this._table().rows[i]).height();
+                }
+            }
+            return 0;
+        },
+
+        _yLastVisibleRowHeight: function () {
+            for (var i = this._table().rows.length - this.options.rowsInFooter - $('.sg-h-scroll-container', this.widget()).length - 1; i >= this.options.rowsInHeader; i--) {
+                if ($(this._table().rows[i]).css('display') != 'none') {
+                    return $(this._table().rows[i]).height();
+                }
+            }
+            return 0;
+        },
+
         _yUpdateRowsVisibility: function () {
 
             if (!this._yScrollNeeded())
@@ -359,10 +410,9 @@
 
         _attachToEndScrolling: function (element, handler) {
             element.scroll(function() {
-
                 clearTimeout(element.data('scrollTimer'));
 
-                $.data(this, 'scrollTimer', setTimeout(function() {
+                $.data(this, 'scrollTimer', setTimeout(function () {
                     handler.apply(this);
                 }, 300));
             });
@@ -405,6 +455,66 @@
             }
             event.preventDefault();
         },
+
+        _touchStart: function (event) {
+            if (event.originalEvent.touches && event.originalEvent.touches.length == 1) {
+                var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+                this._currentTouch = { X: touch.pageX, Y: touch.pageY };
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        },
+
+        _touchMove: function (event) {
+            if (event.originalEvent.touches && event.originalEvent.touches.length == 1 && this._currentTouch != null) {
+                var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+
+                var newTouch = { X: touch.pageX, Y: touch.pageY };
+                var deltaX = this._currentTouch.X - newTouch.X;
+                var deltaY = this._currentTouch.Y - newTouch.Y;
+
+                var $heightDivContainer = $('.sg-v-scroll-container', this.widget());
+                if (deltaY > 0) { 
+                    var rowToHideHeight = this._yFirstVisibleRowHeight();
+                    if (rowToHideHeight != 0 && deltaY > rowToHideHeight) {
+                        $heightDivContainer.scrollTop($heightDivContainer.scrollTop() + (this._yRowScrollStep() + 1))
+                        this._currentTouch.Y -= rowToHideHeight;
+                        this._yUpdateRowsVisibility();
+                    }
+                }
+                else {
+                    var rowToHideHeight = this._yLastVisibleRowHeight();
+                    if (rowToHideHeight != 0 && deltaY < -1 * rowToHideHeight) {
+                        $heightDivContainer.scrollTop($heightDivContainer.scrollTop() - (this._yRowScrollStep() + 1))
+                        this._currentTouch.Y += rowToHideHeight;
+                        this._yUpdateRowsVisibility();
+                    }
+                }
+
+                var $widthDivContainer = $('.sg-h-scroll-container', this.widget());
+                if (deltaX > 0) {
+                    var columnToHideWidth = this._xFirstVisibleColumnWidth();
+                    if (columnToHideWidth != 0 && deltaX > columnToHideWidth) {
+                        $widthDivContainer.scrollLeft($widthDivContainer.scrollLeft() + (this._xColumnScrollStep() + 1))
+                        this._currentTouch.X -= rowToHideHeight;
+                    }
+                }
+                else {
+                    var columnToHideWidth = this._xLastVisibleColumnWidth();
+                    if (columnToHideWidth != 0 && deltaX < -1 * columnToHideWidth) {
+                        $widthDivContainer.scrollLeft($widthDivContainer.scrollLeft() - (this._xColumnScrollStep() + 1))
+                        this._currentTouch.X += columnToHideWidth;
+                    }
+                }
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        },
+
+        _touchEnd: function (event) {
+            this._currentTouch = null
+        },
+
         
         _table: function() {
             return this.widget().get(0);
@@ -415,7 +525,7 @@
 
             for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
                 var row = rows[rowIndex];
-                var indAdjustments = $(row).data(CELL_SPAN_ADJUSTMENTS);
+                var indAdjustments = $(row).get(0)[CELL_SPAN_ADJUSTMENTS];
                 if (!indAdjustments)
                     indAdjustments = [];
 
@@ -425,7 +535,7 @@
 
                     if (cellIndex > 0) {
                         var $prevCell = $(row.cells[cellIndex - 1]);
-                        prevCellEndsAt = $prevCell.data(CELL_INDEX_DATA);
+                        prevCellEndsAt = $prevCell.get(0)[CELL_INDEX_DATA];
                         if ($prevCell.attr('colspan')) {
                             prevCellEndsAt += this._getColSpan($prevCell) - 1;
                         }
@@ -441,18 +551,18 @@
                         }
                     }
                     
-                    $cell.data(CELL_INDEX_DATA, indexToSet);
+                    $cell.get(0)[CELL_INDEX_DATA] = indexToSet;
 
                     if ($cell.attr('rowspan') > 1 ) {
                         var span = $cell.attr('rowspan');
 
                         for (var rowShift = rowIndex + 1; rowShift < rowIndex + span && rowShift < rows.length; rowShift++) {
                             var $shiftedRow = $(rows[rowShift]);
-                            var adjustments = $shiftedRow.data(CELL_SPAN_ADJUSTMENTS);
+                            var adjustments = $shiftedRow.get(0)[CELL_SPAN_ADJUSTMENTS];
                             if (!adjustments)
                                 adjustments = [];
                             adjustments.push({ index: indexToSet, adjustment: this._getColSpan($cell) });
-                            $shiftedRow.data(CELL_SPAN_ADJUSTMENTS, adjustments);
+                            $shiftedRow.get(0)[CELL_SPAN_ADJUSTMENTS] = adjustments;
                         }
                     }
                 }
@@ -462,7 +572,11 @@
         _getColSpan: function($cell) {
             if ($cell.data('scroll-span'))
                 return $cell.data('scroll-span');
-            return $cell.attr('colspan') | 1;
+
+            if ($cell.attr('colspan'))
+                return $cell.attr('colspan') * 1;
+
+            return 1;
         }
     });
 

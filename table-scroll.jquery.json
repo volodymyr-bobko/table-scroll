@@ -4,12 +4,12 @@
     "description": "jQuery.table_scroll plugin adds vertical and horizontal scrollbars to HTML table element.",
     "keywords": [
         "scrolling",
-        "fixed",
-		"columns",
-        "scroll",
-        "table"
+        "fixed-columns",
+		"scroll",
+        "table",
+		"touch-screen"
     ],
-    "version": "2.0.1",
+    "version": "2.0.3",
     "author": {
         "name": "Volodymyr Bobko",
         "url": "http://icocentre.com"

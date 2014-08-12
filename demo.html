@@ -34,6 +34,7 @@
         <ul>
             <li>Vertical scrolling.</li>
             <li>Horizontal scrolling with possibility to specify left and right fixed columns.</li>
+            <li>Touch screen support.</li>
             <li>Auto detect vertical scrollable area and excluds thead and tfoot.</li>
             <li>Doesn't clone table elements - so your events stay bound.</li>
             <li>Doesn't divide your table into separate parts for scrolling, it means that width of column header is always in sync with cells width.</li>
@@ -88,12 +89,14 @@
                             <table width="100%" class="inner-table">
                                 <thead>
                                     <tr>
-                                        <td rowspan="2">Left 1</td>
-                                        <td rowspan="2">Left 2</td>
-                                        <td colspan="3" data-scroll-span="20">Periods</td>
-                                        <td rowspan="2">Right</td>
+                                        <td rowspan="2">&nbsp;</td>
+                                        <td colspan="2">Author</td>
+                                        <td colspan="3" data-scroll-span="{{columnsCount}}">Periods</td>
+                                        <td rowspan="2">Price</td>
                                     </tr>
                                     <tr>
+                                        <td>First Name</td>
+                                        <td>Last Name</td>
                                         {{#columns}}
                                         <td style="width: 90px;">{{.}}</td>
                                         {{/columns}}
@@ -102,23 +105,24 @@
                                 <tbody>
                                     {{#data}}
                                     <tr>
-                                        <td>{{columns1}}</td>
-                                        <td>{{columns2}}</td>
+                                        <td>{{Index}}</td>
+                                        <td>{{FirstName}}</td>
+                                        <td>{{LastName}}</td>
                                         {{#data}}
                                         <td>{{.}}</td>
                                         {{/data}}
-                                        <td>{{columns3}}</td>
+                                        <td>${{Price}}</td>
                                     </tr>
                                     {{/data}}
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td>Footer 1</td>
-                                        <td>Footer 2</td>
+                                        <td>&nbsp;</td>
+                                        <td colspan="2">Sold Total</td>
                                         {{#footers}}
                                         <td>{{.}}</td>
                                         {{/footers}}
-                                        <td>Footer 3</td>
+                                        <td>&nbsp;</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -127,7 +131,7 @@
                     <td>
                         <pre class="prettyprint lang-js">
 $('table').table_scroll({
-    fixedColumnsLeft: 2,
+    fixedColumnsLeft: 3,
     fixedColumnsRight: 1,
     columnsInScrollableArea: 3
 });
@@ -138,36 +142,39 @@ $('table').table_scroll({
 &lt;table&gt;
     &lt;thead&gt;
         &lt;tr&gt;
-            &lt;td rowspan=&quot;2&quot;&gt;Left 1&lt;/td&gt;
-            &lt;td rowspan=&quot;2&quot;&gt;Left 2&lt;/td&gt;
-            &lt;td colspan=&quot;3&quot; <b style="text-decoration:underline">data-scroll-span=&quot;20&quot;</b>&gt;Periods&lt;/td&gt;
-            &lt;td rowspan=&quot;2&quot;&gt;Right&lt;/td&gt;
+            &lt;td rowspan=&quot;2&quot;&gt;&lt;/td&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Author&lt;/td&gt;
+            &lt;td colspan=&quot;3&quot; <b style="text-decoration:underline">data-scroll-span=&quot;12&quot;</b>&gt;Periods&lt;/td&gt;
+            &lt;td rowspan=&quot;2&quot;&gt;Price&lt;/td&gt;
         &lt;/tr&gt;
         &lt;tr&gt;
-            &lt;td&gt;Period 1&lt;/td&gt;
+            &lt;td rowspan=&quot;2&quot;&gt;First Name&lt;/td&gt;
+            &lt;td rowspan=&quot;2&quot;&gt;Last Name&lt;/td&gt;
+            
+            &lt;td&gt;Jan 2013&lt;/td&gt;
             ...
-            &lt;td&gt;Period 20&lt;/td&gt;
+            &lt;td&gt;Dec 2013&lt;/td&gt;
         &lt;/tr&gt;
     &lt;/thead&gt;
     &lt;tbody&gt;
         &lt;tr&gt;
-            &lt;td&gt;Left 1 1&lt;/td&gt;
-            &lt;td&gt;Left 1 2&lt;/td&gt;
-            &lt;td&gt;Period 1&lt;/td&gt;
+            &lt;td&gt;First Name&lt;/td&gt;
+            &lt;td&gt;Last Name&lt;/td&gt;
+            &lt;td&gt;0000&lt;/td&gt;
             ...
-            &lt;td&gt;Period 20&lt;/td&gt;
-            &lt;td&gt;Right 1&lt;/td&gt;
+            &lt;td&gt;0000&lt;/td&gt;
+            &lt;td&gt;$00.00&lt;/td&gt;
         &lt;/tr&gt;
         ...
     &lt;/tbody&gt;
     &lt;tfoot&gt;
         &lt;tr&gt;
-            &lt;td&gt;Footer 1&lt;/td&gt;
-            &lt;td&gt;Footer 2&lt;/td&gt;
-            &lt;td&gt;Total 1&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+            &lt;td colspan=&quot;2&quot;&gt;Total&lt;/td&gt;
+            &lt;td&gt;0000&lt;/td&gt;
             ...
-            &lt;td&gt;Total 20&lt;/td&gt;
-            &lt;td&gt;Footer 3&lt;/td&gt;
+            &lt;td&gt;0000&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
         &lt;/tr&gt;
     &lt;/tfoot&gt;
 &lt;/table&gt;</pre>

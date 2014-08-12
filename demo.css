@@ -50,6 +50,7 @@ ul>li {
     border-radius: 23px;
     background: white;
     border: 1px solid gray;
+    min-width: 1400px
 }
 
 .semple>tbody>tr>td {
@@ -93,7 +94,7 @@ ul>li {
 }
 
 .inner-table>tbody>tr:hover>td {
-    color: #1a727c;
+    
 }
 
 .inner-table>tfoot>tr>td {
