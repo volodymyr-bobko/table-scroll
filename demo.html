@@ -13,7 +13,7 @@
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
-    <script src="table-scroll.js"></script>
+    <script src="table-scroll.min.js"></script>
     <script src="demo.js"></script>
     <link rel="stylesheet" href="demo.css" />
 </head>
@@ -53,6 +53,7 @@
                 <ul>'auto' - Scroll appears only if overflowing rows exists.</ul>
                 <ul>'scroll' - Scroll is always visible, and will be disabled if there are no overflowing rows.</ul>
             </li>
+            <li><b>scrollY</b> - Default: 0. Number of row to scroll to.</li>
             <li><b>fixedColumnsLeft</b> - Default: 0. Number of columns at the left side of scrollable area that will not be scrolled.</li>
             <li><b>fixedColumnsRight</b> - Default: 0. Number of columns at the right side of scrollable area that will not be scrolled.</li>
             <li><b>columnsInScrollableArea</b> - Default: 5. </li>
@@ -61,7 +62,7 @@
                 <ul>'auto' - Scroll appears only if overflowing columns exists.</ul>
                 <ul>'scroll' - Scroll is always visible, and will be disabled if there are no overflowing columns.</ul>
             </li>
-            
+            <li><b>scrollX</b> - Default: 0. Number of column to scroll to.</li>
         </ul>
     </div>
     
@@ -133,7 +134,9 @@
 $('table').table_scroll({
     fixedColumnsLeft: 3,
     fixedColumnsRight: 1,
-    columnsInScrollableArea: 3
+    columnsInScrollableArea: 3,
+    scrollX: 5,
+    scrollY: 10
 });
 </pre>
                     </td>

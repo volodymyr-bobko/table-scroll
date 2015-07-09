@@ -13,6 +13,9 @@
             fixedColumnsLeft: 0,
             fixedColumnsRight: 0,
 
+            scrollX: 0,
+            scrollY: 0,
+
             rowsInScrollableArea: 10,
             columnsInScrollableArea: 5,
 
@@ -44,6 +47,10 @@
             this.widget().on('touchmove', $.proxy(this._touchMove, this));
             this.widget().on('touchend', $.proxy(this._touchEnd, this));
             
+            this._xMoveScroll(this.options.scrollX);
+            this._yMoveScroll(this.options.scrollY);
+            this._yUpdateRowsVisibility();
+            this._xUpdateColumnsVisibility();
         },
 
         _ensureSettings: function() {
@@ -152,6 +159,16 @@
             if (this._xScrollableColumnsCount() == 0)
                 return 0;
             return this._xScrollDelta() / this._xScrollableColumnsCount();
+        },
+
+        _xMoveScroll: function(position) {
+            position = Math.min(this._xScrollableColumnsCount(), position);
+            position = Math.max(position, 0);
+
+            position = this._xColumnScrollStep() * position;
+            var $widthDivContainer = $('.sg-h-scroll-container', this.widget());
+            if ($widthDivContainer.scrollLeft() != position)
+                $widthDivContainer.scrollLeft(position);
         },
 
         _setColumnVisibility: function(index, visible, start, end) {
@@ -344,6 +361,17 @@
             if (this._yScrollableRowsCount() == 0)
                 return 0;
             return this._yScrollDelta() / this._yScrollableRowsCount();
+        },
+
+        _yMoveScroll: function(position) {
+            position = Math.min(this._yScrollableRowsCount(), position);
+            position = Math.max(position, 0);
+
+            var step = this._yRowScrollStep();
+            position = step * position;
+            var $heightDivContainer = $('.sg-v-scroll-container', this.widget());
+            if ($heightDivContainer.scrollTop() != position)
+                $heightDivContainer.scrollTop(position + step / 2);
         },
 
         _yUpdateScrollHeights: function () {

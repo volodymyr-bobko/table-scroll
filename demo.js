@@ -9,7 +9,9 @@ $(function () {
     $(semple1Html).appendTo($('#holder-semple-1')).table_scroll({
         fixedColumnsLeft: 3,
         fixedColumnsRight: 1,
-        columnsInScrollableArea: 3
+        columnsInScrollableArea: 3,
+        scrollX: 5,
+        scrollY: 10
     });
 
     var semple2Html = Mustache.to_html($('#tamplate-semple-2').html(), { rows: rows });
