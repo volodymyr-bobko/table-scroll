@@ -1,0 +1,110 @@
+﻿body {
+    font: normal .80em 'trebuchet ms', arial, sans-serif;
+    background: #F5F5EE;
+    color: #555;
+    margin: 20px;
+}
+
+code {
+    font-size: 17px;
+}
+
+h1>code {
+    font-size: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #000;
+    font-weight: normal;
+}
+
+ul>li {
+    list-style-type: none;
+    background: url(images/bullet.png) no-repeat;
+    margin: 0 0 0 0;
+    padding: 0 0 4px 25px;
+    line-height: 1.5em;
+}
+
+.semple>thead>tr>td {
+    align-content: center;
+    text-align: center;
+}
+
+.semple>thead>tr:first-child {
+    color: #1a727c;
+}
+
+.semple tbody td {
+    vertical-align: top;
+}
+
+.section {
+    margin-top: 40px;
+    margin-left: 30px;
+}
+
+.semple-section {
+    -webkit-border-radius: 23px;
+    -moz-border-radius: 23px;
+    border-radius: 23px;
+    background: white;
+    border: 1px solid gray;
+    min-width: 1400px
+}
+
+.semple>tbody>tr>td {
+    padding: 10px;
+    border-left: 3px solid #555;
+}
+
+.semple>tbody>tr>td:first-child {
+    border-left: none;
+}
+
+.semple-section>h2 {
+    text-align: center;
+    margin-top: 7px;
+    margin-bottom: 10px;
+}
+
+.semple-section pre {
+    border: none;
+}
+
+.inner-table {
+    border-collapse:collapse;
+}
+
+.inner-table>thead>tr>td {
+    border: 1px solid black;
+    padding:5px;
+    vertical-align: middle;
+    font-weight:bold;
+}
+
+.inner-table>thead>tr>td[colspan] {
+    text-align:center;
+}
+
+.inner-table>tbody>tr>td {
+    color: #777;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+}
+
+.inner-table>tbody>tr:hover>td {
+    
+}
+
+.inner-table>tfoot>tr>td {
+    border: 1px solid black;
+    padding:5px;
+    vertical-align: middle;
+    font-weight:bold;
+}
+
+.inner-table>tbody>tr {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+}
