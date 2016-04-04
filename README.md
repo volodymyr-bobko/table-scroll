@@ -1,6 +1,6 @@
 Table Scroll
 
-Try it here - http://table-scroll.site90.com
+Try it here - http://volodymyr-bobko.github.io/table-scroll/ 
 
 jQuery.table_scroll plugin adds vertical and horizontal scrollbars to HTML table element.
 
